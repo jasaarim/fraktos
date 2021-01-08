@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Cookie&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+
+:root {
+    /* Update from JS. Fixes an inconsistency in some mobile browsers */
+    --vh: 1vh;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', sans;
+    font-size: 18px;
+}
+
+h2 {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-100%) translateX(-90%);
+    left: 50%;
+    white-space: nowrap;
+    color: #fff;
+    font-size: 6vh;
+}
+
+#gl-canvas.zoomed ~ h2 {
+    display: none;
+}
+
+#gl-canvas {
+    width: 100vw;
+    height: calc(100 * var(--vh));
+    touch-action: none;
+}
+
+#info-checkbox {
+    display: none;
+}
+
+#info-button {
+    top: 3vh;
+    height: 40px;
+    background: rgba(50, 50, 50, 0.5);
+    color: #fff;
+}
+
+#info-button, #info h1 {
+    font-family: 'Cookie', cursive;
+    font-size: 36px;
+    margin: 0;
+}
+
+#info-button:hover, #info-checkbox:checked ~ #info-button {
+    background: #eee;
+    border-color: #222;
+    color: #222;
+}
+
+#info-checkbox:checked ~ #info-button {
+    border-color: #eee;
+}
+
+#info-button, #info  {
+    background: rgba(50, 50, 50, 0.5);
+    color: #eee;
+}
+
+#info-button, #info {
+    position: absolute;
+    left: 3vw;
+    border-radius: 10px;
+    padding: 10px;
+    border: solid;
+}
+
+#info-checkbox:checked ~ #info {
+    visibility: visible;
+    width: 300px;
+}
+
+#info {
+    top: calc(3vh + 60px + 3vh);
+    width: 0px;
+    max-height: 60vh;
+    max-width: 80vw;
+    visibility: hidden;
+    overflow: hidden;
+    transition: width 0.7s;
+}
+
+

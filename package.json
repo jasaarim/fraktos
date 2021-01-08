@@ -1,0 +1,15 @@
+{
+    "name": "Fraktos",
+    "description": "Explore fractals based on complex numbers",
+    "version": "0.1.0",
+    "licence": "GPL",
+    "homepage": "https://github.com/jasaarim/fraktos",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jasaarim/fraktos"
+    },
+    "scripts": {
+        "server": "python3 -m http.server --directory public",
+        "build": "rm build -rf; cp -L -r public build"
+    }
+}
