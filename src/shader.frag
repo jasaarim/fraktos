@@ -190,21 +190,24 @@ void main() {
 
     float color;
     float acolor = 0.0;
-
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            vec2 fragCoord = vec2(gl_FragCoord.x + float(i) / 3.0, gl_FragCoord.y + float(j) / 3.0);
-            vec2 pixelCoord = 2.0 * (fragCoord.xy / uWindowSize - vec2(0.5, 0.5));
-            pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
-            if (uScale > SCALE_LIM) {
+    if (uScale > SCALE_LIM) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                vec2 fragCoord = vec2(gl_FragCoord.x + float(i) / 3.0,
+                                      gl_FragCoord.y + float(j) / 3.0);
+                vec2 pixelCoord = 2.0 * (fragCoord.xy / uWindowSize
+                                         - vec2(0.5, 0.5));
+                pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
                 color = simpleIteration(pixelCoord, uScale, uShift);
-            } else {
-                color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+                acolor += color;
             }
-            acolor += color;
         }
+        acolor /= 3.0 * 3.0;
+    } else {
+        vec2 pixelCoord = 2.0 * (gl_FragCoord.xy / uWindowSize - vec2(0.5, 0.5));
+        pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
+        acolor = doubleIteration(pixelCoord, uScale, uShiftHiLo);
     }
-    acolor /= 3.0 * 3.0;
     if (uScale > SCALE_LIM) {
         gl_FragColor = vec4(pow(acolor, 2.0), pow(acolor, 0.5), acolor, 1.0);
     } else {
