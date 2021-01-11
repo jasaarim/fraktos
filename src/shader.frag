@@ -188,17 +188,29 @@ float doubleIteration(vec2 pixelCoord, float scale, vec4 shiftHiLo) {
 
 void main() {
 
-    vec2 pixelCoord = 2.0 * (gl_FragCoord.xy / uWindowSize - vec2(0.5, 0.5));
-    // X step equal to y step
-    pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
-
     float color;
-
+    float acolor = 0.0;
     if (uScale > SCALE_LIM) {
-        color = simpleIteration(pixelCoord, uScale, uShift);
-        gl_FragColor = vec4(pow(color, 2.0), pow(color, 0.5), color, 1.0);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                vec2 fragCoord = vec2(gl_FragCoord.x + float(i) / 3.0,
+                                      gl_FragCoord.y + float(j) / 3.0);
+                vec2 pixelCoord = 2.0 * (fragCoord.xy / uWindowSize
+                                         - vec2(0.5, 0.5));
+                pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
+                color = simpleIteration(pixelCoord, uScale, uShift);
+                acolor += color;
+            }
+        }
+        acolor /= 3.0 * 3.0;
     } else {
-        color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
-        gl_FragColor = vec4(pow(color, 0.5), pow(color, 2.0), 0, 1.0);
+        vec2 pixelCoord = 2.0 * (gl_FragCoord.xy / uWindowSize - vec2(0.5, 0.5));
+        pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
+        acolor = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+    }
+    if (uScale > SCALE_LIM) {
+        gl_FragColor = vec4(pow(acolor, 2.0), pow(acolor, 0.5), acolor, 1.0);
+    } else {
+        gl_FragColor = vec4(pow(acolor, 0.5), pow(acolor, 2.0), 0, 1.0);
     }
 }
