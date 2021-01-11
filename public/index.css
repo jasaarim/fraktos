@@ -79,6 +79,10 @@ h2 {
     width: 300px;
 }
 
+#info-checkbox:checked ~ #zoom-instruction {
+    display: none;
+}
+
 #info {
     top: calc(3vh + 60px + 3vh);
     width: 0px;
