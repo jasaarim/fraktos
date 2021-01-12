@@ -1,3 +1,17 @@
+import { initShaderProgram } from './canvas-shaders.js';
+
+
+const INITIAL_STATE = {
+    scale: 3.25,
+    shift: [0, 0]
+}
+
+const PARAM_MAPPING = {
+    scale: ['uScale', '1f'],
+    shift: ['uShift', '2fv']
+}
+
+
 async function initialize() {
     const canvas = document.querySelector('#gl-canvas');
     const gl = canvas.getContext('webgl');
@@ -13,8 +27,6 @@ async function initialize() {
           .then(response => response.text());
     const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 
-    fillCanvas(gl, shaderProgram);
-
     canvas.gl = gl;
     canvas.shaderProgram = shaderProgram;
     canvas.draw = draw;
@@ -25,61 +37,43 @@ async function initialize() {
 
     canvas.resize = resize;
     canvas.draw = draw;
+    canvas.getState = getState;
+    canvas.setState = setState;
 
-    canvas.setUniform('uScale', 3.25, '1f');
+    canvas.getState(false, true);
     canvas.resize();
 }
 
 
-function initShaderProgram(gl, vsSource, fsSource) {
-    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-    const shaderProgram = gl.createProgram();
-
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert('Unable to initialize the shader program: '
-              + gl.getProgramInfoLog(shaderProgram));
-        return;
+function getState(initial, fallback) {
+    const params = new URLSearchParams(window.location.search);
+    for (name in INITIAL_STATE) {
+        if (!initial && params.get(name)) {
+            let value = params.get(name);
+            if (value.includes(',')) {
+                value = value.split(',');
+            }
+            const uniform = PARAM_MAPPING[name][0];
+            const type = PARAM_MAPPING[name][1];
+            this.setUniform(uniform, value, type);
+        } else if (initial || fallback) {
+            const value = INITIAL_STATE[name];
+            const uniform = PARAM_MAPPING[name][0];
+            const type = PARAM_MAPPING[name][1];
+            this.setUniform(uniform, value, type);
+        }
     }
-
-    gl.useProgram(shaderProgram);
-
-    return shaderProgram;
 }
 
 
-function loadShader(gl, type, source) {
-    const shader = gl.createShader(type);
-
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert('An error occurred compiling the shaders: '
-              + gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
+function setState(...params) {
+    const searchParams = new URLSearchParams(window.location.search);
+    for (const param of params) {
+        const value = this.getUniform(PARAM_MAPPING[param][0]);
+        searchParams.set(param, value);
     }
-
-    return shader;
-}
-
-
-function fillCanvas(gl, shaderProgram) {
-    const positionBuffer = gl.createBuffer();
-    const positions = [-1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0];
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-    const vertexPosition = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
-
-    gl.vertexAttribPointer(vertexPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vertexPosition);
+    const newURL = window.location.pathname + '?' + searchParams.toString();
+    history.pushState(null, '', newURL);
 }
 
 
@@ -121,7 +115,6 @@ function setUniform(name, value, type) {
         console.error(`Unknown uniform type "${type}"`)
 
     if (name == 'uScale') {
-        console.log(value);
         if (value < 3.0 && !this.classList.contains('zoomed'))
             this.classList.add('zoomed');
         else if (value >= 3.0 && this.classList.contains('zoomed'))

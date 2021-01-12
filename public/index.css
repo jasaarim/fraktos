@@ -38,20 +38,26 @@ h2 {
     display: none;
 }
 
-#info-button {
+#info-button, #home-button {
     top: 3vh;
     height: 40px;
-    background: rgba(50, 50, 50, 0.5);
-    color: #fff;
 }
 
-#info-button, #info h1 {
+#info-button {
+    left: 3vw;
+}
+
+#home-button {
+    right: 3vw;
+}
+
+#info-button, #info h1, #home-button {
     font-family: 'Cookie', cursive;
     font-size: 36px;
     margin: 0;
 }
 
-#info-button:hover, #info-checkbox:checked ~ #info-button {
+#info-button:hover, #home-button:hover, #info-checkbox:checked ~ #info-button {
     background: #eee;
     border-color: #222;
     color: #222;
@@ -61,14 +67,13 @@ h2 {
     border-color: #eee;
 }
 
-#info-button, #info  {
+#info-button, #home-button, #info  {
     background: rgba(50, 50, 50, 0.5);
     color: #eee;
 }
 
-#info-button, #info {
+#info-button, #info, #home-button {
     position: absolute;
-    left: 3vw;
     border-radius: 10px;
     padding: 10px;
     border: solid;
@@ -84,12 +89,13 @@ h2 {
 }
 
 #info {
+    left: 3vw;
     top: calc(3vh + 60px + 3vh);
     width: 0px;
     max-height: 60vh;
     max-width: 80vw;
     visibility: hidden;
-    overflow: hidden;
+    overflow-y: auto;
     transition: width 0.7s;
 }
 

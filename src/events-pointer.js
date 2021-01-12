@@ -55,6 +55,7 @@ function pointerUp(event) {
 
     if (event.pointerId in canvas.eventCache) {
         delete canvas.eventCache[event.pointerId];
+        canvas.setState('shift', 'scale');
     } else {
         canvas.eventCache = {};
     }
