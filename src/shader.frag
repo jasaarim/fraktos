@@ -1,5 +1,6 @@
 precision highp float;
 
+uniform bool uAntialiasing;
 uniform vec2 uWindowSize, uShift;
 uniform float uScale;
 
@@ -42,13 +43,21 @@ vec2 mul12(float a, float b) {
     float x = a * b;
     vec2 aHiLo = split(a);
     vec2 bHiLo = split(b);
-    float err1 = x - (aHiLo.x * bHiLo.x);
-    float err2 = err1 - (aHiLo.y * bHiLo.x);
-    float err3 = err2 - (aHiLo.x * bHiLo.y);
-    float y = (aHiLo.y * bHiLo.y) - err3;
+    float err1 = x - aHiLo.x * bHiLo.x;
+    float err2 = err1 - aHiLo.y * bHiLo.x;
+    float err3 = err2 - aHiLo.x * bHiLo.y;
+    float y = aHiLo.y * bHiLo.y - err3;
     return vec2(x, y);
 }
 
+vec2 sqr12(float a) {
+    float x = a * a;
+    vec2 aHiLo = split(a);
+    float err1 = x - aHiLo.x * aHiLo.x;
+    float err2 = err1 - 2.0 * aHiLo.y * aHiLo.x;
+    float y = aHiLo.y * aHiLo.y - err2;
+    return vec2(x, y);
+}
 
 /* This is the addition form of andrewthall.org/papers/df64_qf128.pdf
 
@@ -84,9 +93,14 @@ vec2 add22(vec2 a, vec2 b) {
 }
 
 vec2 mul22(vec2 a, vec2 b) {
-
     vec2 t12 = mul12(a.x, b.x);
     float t3 = ((a.x * b.y) + (a.y * b.x)) + t12.y;
+    return add12(t12.x, t3);
+}
+
+vec2 sqr22(vec2 a) {
+    vec2 t12 = sqr12(a.x);
+    float t3 = 2.0 * a.x * a.y + t12.y;
     return add12(t12.x, t3);
 }
 
@@ -97,8 +111,8 @@ vec2 mandelbrotStep(vec2 p, vec2 c) {
 
 
 vec4 mandelbrotStep2(vec4 pHiLo, vec4 cHiLo) {
-    vec2 pxpx = mul22(pHiLo.xz, pHiLo.xz);
-    vec2 pypy = mul22(pHiLo.yw, pHiLo.yw);
+    vec2 pxpx = sqr22(pHiLo.xz);
+    vec2 pypy = sqr22(pHiLo.yw);
     vec2 px2 = mul22(vec2(2.0, 0.0), pHiLo.xz);
     vec2 pxpy2 = mul22(px2, pHiLo.yw);
     vec2 pxpx_pypy = add22(pxpx, -pypy);
@@ -111,14 +125,6 @@ vec4 mandelbrotStep2(vec4 pHiLo, vec4 cHiLo) {
 
 bool escaped(vec2 p) {
     return (p.x * p.x + p.y * p.y) > 4.0;
-}
-
-
-bool escaped2(vec4 pHiLo) {
-    vec2 pxpx = mul22(pHiLo.xz, pHiLo.xz);
-    vec2 pypy = mul22(pHiLo.yw, pHiLo.yw);
-    vec2 pxpx_pypy = add22(pxpx, pypy);
-    return (pxpx_pypy.x + pxpx_pypy.y) > 4.0;
 }
 
 
@@ -175,7 +181,7 @@ float doubleIteration(vec2 pixelCoord, float scale, vec4 shiftHiLo) {
     float color = 0.0;
     for (int i = 0; i < 1000; i++) {
         pHiLo = mandelbrotStep2(pHiLo, cHiLo);
-        if (escaped2(pHiLo)) {
+        if (escaped(pHiLo.xy)) {
             color = float(i) / float(maxIter);
             break;
         } else if (i > maxIter) {
@@ -186,31 +192,59 @@ float doubleIteration(vec2 pixelCoord, float scale, vec4 shiftHiLo) {
 }
 
 
+vec2 pixelCoordinates(float x_offset, float y_offset) {
+    vec2 fragCoord = vec2(gl_FragCoord.x + x_offset,
+                          gl_FragCoord.y + y_offset);
+    vec2 pixelCoord = 2.0 * (fragCoord.xy / uWindowSize - vec2(0.5, 0.5));
+    pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
+
+    return pixelCoord;
+}
+
+
+float antialiasingIteration(bool useDoubleFloat) {
+    float color;
+    float acolor = 0.0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            vec2 pixelCoord = pixelCoordinates(float(i) / 3.0, float(j) / 3.0);
+            if (useDoubleFloat) {
+                color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+            } else {
+                color = simpleIteration(pixelCoord, uScale, uShift);
+            }
+            acolor += color;
+        }
+    }
+    acolor /= 3.0 * 3.0;
+
+    return acolor;
+}
+
+float iteration(bool useDoubleFloat) {
+    float color;
+    vec2 pixelCoord = pixelCoordinates(0.0, 0.0);
+    if (useDoubleFloat) {
+        color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+    } else {
+        color = simpleIteration(pixelCoord, uScale, uShift);
+    }
+    return color;
+}
+
+
 void main() {
 
     float color;
-    float acolor = 0.0;
-    if (uScale > SCALE_LIM) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                vec2 fragCoord = vec2(gl_FragCoord.x + float(i) / 3.0,
-                                      gl_FragCoord.y + float(j) / 3.0);
-                vec2 pixelCoord = 2.0 * (fragCoord.xy / uWindowSize
-                                         - vec2(0.5, 0.5));
-                pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
-                color = simpleIteration(pixelCoord, uScale, uShift);
-                acolor += color;
-            }
-        }
-        acolor /= 3.0 * 3.0;
+    bool useDoubleFloat = uScale < SCALE_LIM;
+    if (uAntialiasing) {
+        color = antialiasingIteration(useDoubleFloat);
     } else {
-        vec2 pixelCoord = 2.0 * (gl_FragCoord.xy / uWindowSize - vec2(0.5, 0.5));
-        pixelCoord.x = uWindowSize.x / uWindowSize.y * pixelCoord.x;
-        acolor = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+        color = iteration(useDoubleFloat);
     }
-    if (uScale > SCALE_LIM) {
-        gl_FragColor = vec4(pow(acolor, 2.0), pow(acolor, 0.5), acolor, 1.0);
+    if (useDoubleFloat) {
+        gl_FragColor = vec4(pow(color, 0.5), pow(color, 2.0), 0, 1.0);
     } else {
-        gl_FragColor = vec4(pow(acolor, 0.5), pow(acolor, 2.0), 0, 1.0);
+        gl_FragColor = vec4(pow(color, 2.0), pow(color, 0.5), color, 1.0);
     }
 }

@@ -24,6 +24,7 @@ window.addEventListener('popstate', () => canvas.getState());
 
 document.addEventListener('keydown', event => {
     if ([8, 32, 37, 38, 39, 40].includes(event.keyCode)) {
+        canvas.setUniform('uAntialiasing', false, '1i');
         if (event.keyCode == 37) {
             keyboardPan({0: -0.05});
         } else if (event.keyCode == 39) {
@@ -43,6 +44,7 @@ document.addEventListener('keydown', event => {
 
 document.addEventListener('keyup', event => {
     if ([8, 32, 37, 38, 39, 40].includes(event.keyCode)) {
+        canvas.setUniform('uAntialiasing', true, '1i');
         if ([37, 38, 39, 40].includes(event.keyCode))
             canvas.setState('shift');
         else if ([8, 32].includes(event.keyCode))

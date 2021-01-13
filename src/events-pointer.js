@@ -16,6 +16,7 @@ export function panZoom(event) {
     data.pointerUp = pointerUp.bind(data);
 
     canvas.setPointerCapture(event.pointerId);
+    canvas.setUniform('uAntialiasing', false, '1i');
 
     canvas.addEventListener('pointermove', data.pointerMove);
     canvas.addEventListener('pointerup', data.pointerUp);
@@ -60,5 +61,6 @@ function pointerUp(event) {
         canvas.eventCache = {};
     }
 
+    canvas.setUniform('uAntialiasing', true, '1i');
     canvas.releasePointerCapture(event.pointerId);
 }

@@ -41,6 +41,8 @@ h2 {
 #info-button, #home-button {
     top: 3vh;
     height: 40px;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 #info-button {
@@ -98,5 +100,3 @@ h2 {
     overflow-y: auto;
     transition: width 0.7s;
 }
-
-

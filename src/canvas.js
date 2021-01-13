@@ -40,6 +40,8 @@ async function initialize() {
     canvas.getState = getState;
     canvas.setState = setState;
 
+    canvas.setUniform('uAntialiasing', true, '1i');
+
     canvas.getState(false, true);
     canvas.resize();
 }
@@ -111,6 +113,8 @@ function setUniform(name, value, type) {
         this.gl.uniform4fv(location, value);
     else if (type == '1f')
         this.gl.uniform1f(location, value);
+    else if (type == '1i')
+        this.gl.uniform1i(location, value);
     else
         console.error(`Unknown uniform type "${type}"`)
 
