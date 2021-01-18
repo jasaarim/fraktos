@@ -205,18 +205,20 @@ vec2 pixelCoordinates(float x_offset, float y_offset) {
 float antialiasingIteration(bool useDoubleFloat) {
     float color;
     float acolor = 0.0;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            vec2 pixelCoord = pixelCoordinates(float(i) / 3.0, float(j) / 3.0);
-            if (useDoubleFloat) {
-                color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
-            } else {
-                color = simpleIteration(pixelCoord, uScale, uShift);
-            }
-            acolor += color;
+    float xOffsets[5], yOffsets[5];
+    xOffsets[0] = xOffsets[1] = yOffsets[0] = yOffsets[3] = -1.0 / 3.0;
+    xOffsets[2] = yOffsets[2] = 0.0;
+    xOffsets[3] = xOffsets[4] = yOffsets[1] = yOffsets[4] =  1.0 / 3.0;
+    for (int i = 0; i < 5; i++) {
+        vec2 pixelCoord = pixelCoordinates(xOffsets[i], yOffsets[i]);
+        if (useDoubleFloat) {
+            color = doubleIteration(pixelCoord, uScale, uShiftHiLo);
+        } else {
+            color = simpleIteration(pixelCoord, uScale, uShift);
         }
+        acolor += color;
     }
-    acolor /= 3.0 * 3.0;
+    acolor /= 5.0;
 
     return acolor;
 }
