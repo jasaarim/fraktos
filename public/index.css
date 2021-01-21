@@ -59,26 +59,28 @@ h2 {
     margin: 0;
 }
 
-#info-button:hover, #home-button:hover, #info-checkbox:checked ~ #info-button {
-    background: #eee;
-    border-color: #222;
-    color: #222;
-}
 
-#info-checkbox:checked ~ #info-button {
-    border-color: #eee;
-}
-
-#info-button, #home-button, #info  {
+.button, #info  {
     background: rgba(50, 50, 50, 0.5);
     color: #eee;
+    fill: #eee;
 }
 
-#info-button, #info, #home-button {
+.button, #info {
     position: absolute;
     border-radius: 10px;
     padding: 10px;
     border: solid;
+}
+
+/* For some reason .button:hover doesn't seem to register on FF */
+#home-button:hover, #info-button:hover,
+#info-checkbox:checked ~ #info-button,
+#power-plus:hover, #power-minus:hover {
+    background: #eee;
+    border-color: #222;
+    color: #222;
+    fill: #222;
 }
 
 #info-checkbox:checked ~ #info {
@@ -99,4 +101,42 @@ h2 {
     visibility: hidden;
     overflow-y: auto;
     transition: width 0.7s;
+}
+
+#power-knob {
+    position: absolute;
+    bottom: 3vw;
+    right: 3vw;
+    background: #555;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.shaft {
+    position: absolute;
+    top: 50%;
+    background: #333;
+    width: 100%;
+    height: 10px;
+    transform: translateY(-50%);
+    touch-action: none;
+}
+
+#power-plus, #power-minus {
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    width: 20%;
+    padding: 2.5%;
+    height: 20%;
+}
+
+
+#power-minus {
+    top: 60%;
 }

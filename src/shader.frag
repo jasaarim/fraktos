@@ -3,6 +3,7 @@ precision highp float;
 uniform bool uAntialiasing;
 uniform vec2 uWindowSize, uShift;
 uniform float uScale;
+uniform float uPower;
 
 uniform vec4 uShiftHiLo;
 
@@ -109,6 +110,13 @@ vec2 mandelbrotStep(vec2 p, vec2 c) {
     return vec2(p.x * p.x - p.y * p.y, 2.0 * p.x * p.y) + c;
 }
 
+vec2 multibrotStep(vec2 p, vec2 c) {
+    float magn = sqrt(p.x * p.x + p.y * p.y);
+    float angle = atan(p.y, p.x);
+    magn = pow(magn, uPower);
+    angle = angle * uPower;
+    return vec2(magn * cos(angle) + c.x, magn * sin(angle) + c.y);
+}
 
 vec4 mandelbrotStep2(vec4 pHiLo, vec4 cHiLo) {
     vec2 pxpx = sqr22(pHiLo.xz);
@@ -136,7 +144,11 @@ float simpleIteration(vec2 pixelCoord, float scale, vec2 shift) {
 
     float color = 0.0;
     for (int i = 0; i < 1000; i++) {
-        p = mandelbrotStep(p, c);
+        if (uPower == 2.0) {
+            p = mandelbrotStep(p, c);
+        } else {
+            p = multibrotStep(p, c);
+        }
         if (escaped(p)) {
             color = float(i) / float(maxIter);
             break;

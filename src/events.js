@@ -1,8 +1,12 @@
 import {pan as keyboardPan, zoom as keyboardZoom} from './events-keyboard.js';
 import {panZoom as pointerPanZoom} from './events-pointer.js';
+import {rotate as rotatePowerKnob} from './events-pointer-knob.js';
 
 const canvas = document.querySelector('#gl-canvas');
 const homeButton = document.querySelector('#home-button');
+const powerKnob = document.querySelector('#power-knob');
+const powerPlus = document.querySelector('#power-plus');
+const powerMinus = document.querySelector('#power-minus');
 
 
 function resizeVh() {
@@ -60,5 +64,26 @@ canvas.addEventListener('pointerdown', event => {
 
 homeButton.addEventListener('click', event => {
     canvas.getState(true);
-    canvas.setState('scale', 'shift');
-})
+    canvas.setState('scale', 'shift', 'power');
+});
+
+
+powerKnob.addEventListener('pointerdown', event => {
+    rotatePowerKnob(event);
+});
+
+
+powerPlus.addEventListener('click', event => {
+    let power = canvas.getUniform('uPower');
+    power = Math.floor(power) + 1.0;
+    canvas.setUniform('uPower', power, '1f');
+    canvas.setState('power');
+});
+
+
+powerMinus.addEventListener('click', event => {
+    let power = canvas.getUniform('uPower');
+    power = Math.ceil(power) - 1.0;
+    canvas.setUniform('uPower', power, '1f');
+    canvas.setState('power');
+});

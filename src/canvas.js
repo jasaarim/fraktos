@@ -3,12 +3,14 @@ import { initShaderProgram } from './canvas-shaders.js';
 
 const INITIAL_STATE = {
     scale: 3.25,
-    shift: [0, 0]
+    shift: [0, 0],
+    power: 2.0
 }
 
 const PARAM_MAPPING = {
     scale: ['uScale', '1f'],
-    shift: ['uShift', '2fv']
+    shift: ['uShift', '2fv'],
+    power: ['uPower', '1f']
 }
 
 
@@ -23,7 +25,7 @@ async function initialize() {
 
     const vsSource = await fetch('src/shader.vert')
           .then(response => response.text());
-    const fsSource = await fetch('src/shader.frag')
+    const fsSource = await fetch('src/shader.frag?date=2021-01-21')
           .then(response => response.text());
     const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
 

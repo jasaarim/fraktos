@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8"/>
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css?date=2021-01-21">
     <meta name="viewport"
           content="width=device-width, height=device-height,
                    initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -12,8 +12,8 @@
   <body>
     <canvas id="gl-canvas"></canvas>
     <input type="checkbox" id="info-checkbox">
-    <label for="info-checkbox" id="info-button">i</label>
-    <div id="home-button">⌂</div>
+    <label for="info-checkbox" id="info-button" class="button">i</label>
+    <div id="home-button" class="button">⌂</div>
     <div id="info">
       <h1>Fractal explorer</h1>
       <p>
@@ -21,13 +21,28 @@
         keys. Zoom with two pointers or with space and backspace.
       </p>
       <p>
-        Once you zoom into the yellow-red zone, you are outside the
-        precision of native floating point numbers, and you run the
-        program at your own risk (well, you do anyway).  Depending on
-        the device, things may still work due to efforts of
-        algorithmically extending the precision but that's not
-        guaranteed.
+        You can change the multibrot exponent continuously by rotating
+        the screw or as integers with the attached buttons.
       </p>
+      <p>
+        Once you zoom deep enough and the color scale changes, you are
+        outside the precision of native floating point numbers.  You
+        may still try it with the multibrot exponent 2.0 and,
+        depending on the device, things may work due to the efforts of
+        algorithmically extending the precision.
+      </p>
+    </div>
+    <div id="power-knob">
+      <svg id="power-plus" class="button" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 100 100">
+        <polygon points="0,60 100,60 100,40 0,40"/>
+        <polygon points="60,0 60,100 40,100 40,0"/>
+      </svg>
+      <div class="shaft"></div>
+      <svg id="power-minus" class="button" xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 100 100">
+        <polygon points="0,60 100,60 100,40 0,40"/>
+      </svg>
     </div>
     <h2 id="zoom-instruction">Zoom in!</h2>
   </body>
