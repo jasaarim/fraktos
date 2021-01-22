@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8"/>
     <meta name="robots" content="noindex">
-    <link rel="stylesheet" href="index.css?date=2021-01-21">
+    <link rel="stylesheet" href="index.css?date=2021-01-22">
     <meta name="viewport"
           content="width=device-width, height=device-height,
                    initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
@@ -21,8 +21,10 @@
         keys. Zoom with two pointers or with space and backspace.
       </p>
       <p>
-        You can change the multibrot exponent continuously by rotating
-        the screw or as integers with the attached buttons.
+        You can "sharpen" or "roughen" the fractal with the slider
+        that controls pixel iterations.  You can also change the
+        multibrot exponent continuously by rotating the screw or as
+        integers with the attached buttons.
       </p>
       <p>
         Once you zoom deep enough and the color scale changes, you are
@@ -31,6 +33,11 @@
         depending on the device, things may work due to the efforts of
         algorithmically extending the precision.
       </p>
+    </div>
+    <div id="iteration-slider">
+      <div id="iteration-cursor">
+      </div>
+    </div>
     </div>
     <div id="power-knob">
       <svg id="power-plus" class="button" xmlns="http://www.w3.org/2000/svg"

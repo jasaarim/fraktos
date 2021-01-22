@@ -140,3 +140,29 @@ h2 {
 #power-minus {
     top: 60%;
 }
+
+
+#iteration-slider {
+    position: absolute;
+    bottom: calc(100px + 5vw);
+    right: 3vw;
+    background: #555;
+    width: 100px;
+    height: 15px;
+    border-radius: 5px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+
+#iteration-cursor {
+    width: 10px;
+    height: 25px;
+    border-radius: 3px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -5px;
+    background: #333;
+}

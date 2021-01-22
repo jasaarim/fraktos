@@ -4,13 +4,14 @@ uniform bool uAntialiasing;
 uniform vec2 uWindowSize, uShift;
 uniform float uScale;
 uniform float uPower;
+uniform float uIterationFactor;
 
 uniform vec4 uShiftHiLo;
 
 float SCALE_LIM = 0.00005;
 
 int getIterations(float scale) {
-    return 32 + int((1.0 / log(10.0)) * (log(1.0/scale)) * 64.0);
+    return 32 + int((1.0 / log(10.0)) * (log(1.0/scale)) * uIterationFactor);
 }
 
 
